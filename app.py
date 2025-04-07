@@ -7,7 +7,7 @@ from audio_recorder_streamlit import audio_recorder
 model = whisper.load_model("small.en")
 
 # Flask API endpoint
-API_URL = "http://localhost:5000/query"  # Change this if your Flask server is hosted elsewhere
+API_URL = "https://flask-api-ss8m.onrender.com/query"  # Change this if your Flask server is hosted elsewhere
 
 # Function to transcribe audio
 def transcribe_with_whisper(audio_bytes):
