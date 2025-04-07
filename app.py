@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 
 # Flask API endpoint
-API_URL = "http://localhost:5000/query"  # Update this if your Flask server is hosted elsewhere
+API_URL = "https://flask-api-ss8m.onrender.com/query"  # Update this if your Flask server is hosted elsewhere
 
 # Function to query the Flask API
 def query_flask_api(query):
