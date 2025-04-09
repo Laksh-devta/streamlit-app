@@ -2,39 +2,44 @@ import streamlit as st
 import requests
 
 # Flask API endpoint
-API_URL = "https://flask-api-ss8m.onrender.com/query"  # Update this if your Flask server is hosted elsewhere
+API_URL = "http://127.0.0.1:5000/recommend"  # Update this if your Flask server is hosted elsewhere
 
-# Function to query the Flask API
 def query_flask_api(query):
     try:
         response = requests.post(API_URL, json={"query": query})
         if response.status_code == 200:
-            return response.json()
+            return response.json().get("recommended_assessments", [])
         else:
-            return [{"text": f"Error: {response.status_code} - {response.text}"}]
+            st.error(f"Error: {response.status_code} - {response.text}")
+            return []
     except Exception as e:
-        return [{"text": f"Exception: {str(e)}"}]
+        st.error(f"Exception: {str(e)}")
+        return []
 
 def main():
     st.title("SHL Assessment Assistant")
     st.markdown("*Ask questions about the SHL assessment documents.*")
 
-    if "history" not in st.session_state:
-        st.session_state.history = []
+    query = st.text_input("Enter your query:")
 
-    # Text input
-    text_input = st.text_input("Type your question here...")
-
-    if text_input:
-        st.session_state.history.append({"role": "user", "content": text_input})
-        results = query_flask_api(text_input)
-        answer = "\n\n".join([r["text"] for r in results])
-        st.session_state.history.append({"role": "bot", "content": answer})
-
-    # Display chat history
-    for msg in reversed(st.session_state.history):
-        with st.chat_message(msg["role"]):
-            st.write(msg["content"])
+    if st.button("Search"):
+        if not query:
+            st.error("Please enter a query!")
+        else:
+            results = query_flask_api(query)
+            if results:
+                st.write("### Recommended Assessments")
+                for i, result in enumerate(results, start=1):
+                    st.write(f"**Result {i}:**")
+                    st.write(f"**URL:** {result['url']}")
+                    st.write(f"**Adaptive Support:** {result['adaptive_support']}")
+                    st.write(f"**Description:** {result['description']}")
+                    st.write(f"**Duration:** {result['duration']} minutes")
+                    st.write(f"**Remote Support:** {result['remote_support']}")
+                    st.write(f"**Test Type:** {', '.join(result['test_type'])}")
+                    st.write("---")
+            else:
+                st.write("No recommendations found.")
 
 if __name__ == "__main__":
     main()
